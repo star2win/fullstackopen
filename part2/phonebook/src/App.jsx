@@ -73,14 +73,26 @@ const PersonForm = (props) => {
 
 const Persons = (props) => {
 
-  const searchResult = props.persons.filter(person => person.name.toLowerCase().startsWith(props.search.toLowerCase()))
-  console.log(searchResult)
-  if (searchResult.length > 0) {
-    return searchResult.map(person => <div key={person.id}>{person.name} {person.number}</div>)
-  } else if (props.search === '') {
-    return props.persons.map(person => <div key={person.id}>{person.name} {person.number}</div>)
+  const deletePerson = (id, name) => {
+    if (window.confirm(`Delete ${name}?`)) {
+      personsService
+        .deleteID(id)
+        .then(returnedDeleted => {
+          console.log("Deleted ID", returnedDeleted)
+          props.setPersons(props.persons.filter(person => (person.id != returnedDeleted.id)))
+        })
+    }
   }
 
+  const searchResult = props.persons.filter(person => person.name.toLowerCase().startsWith(props.search.toLowerCase()))
+  //.log("search", props.search)
+  
+  if (searchResult.length > 0) {
+    return searchResult.map(person => 
+      <div key={person.id}>{person.name} {person.number} 
+      <button onClick={() => deletePerson(person.id, person.name)}>delete</button>
+      </div>)
+  } 
 }
 
 const App = () => {
@@ -111,7 +123,7 @@ const App = () => {
       />
      
       <h2>Numbers</h2>
-      <Persons persons={persons} search={search} />
+      <Persons persons={persons} search={search} setPersons={setPersons}/>
     </div>
   )
 }
