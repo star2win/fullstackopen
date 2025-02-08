@@ -31,10 +31,15 @@ const PersonForm = (props) => {
     const nameObject = {
       name: props.newName,
       number: props.newNumber,
-      id: String(props.persons.length + 1),
+      //id: String(props.persons.length + 1),
     }
 
-    props.setPersons(props.persons.concat(nameObject))
+    axios
+      .post('http://localhost:3001/persons', nameObject)
+      .then(response => {
+        props.setPersons(props.persons.concat(response.data))
+      })
+    
     props.setNewName('')
     props.setNewNumber('')
   }
