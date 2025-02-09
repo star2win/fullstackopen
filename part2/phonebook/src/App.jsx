@@ -120,6 +120,15 @@ const Persons = (props) => {
           //console.log("Deleted ID", returnedDeleted)
           props.setPersons(props.persons.filter(person => (person.id != returnedDeleted.id)))
         })
+        .catch(error => {
+          props.setNotification(
+            {isSuccess: false, message: `Information of '${name}' has already removed from server`}
+          )
+          props.setPersons(props.persons.filter(person => (person.id != id)))
+          setTimeout(() => {
+            props.setNotification({isSuccess: null, notification: null})
+          }, 5000)
+        })
     }
   }
 
@@ -177,7 +186,9 @@ const App = () => {
       />
      
       <h2>Numbers</h2>
-      <Persons persons={persons} search={search} setPersons={setPersons}/>
+      <Persons persons={persons} setPersons={setPersons}
+               search={search} setNotification={setNotification}
+      />
     </div>
   )
 }
