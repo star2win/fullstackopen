@@ -23,23 +23,46 @@ const PersonForm = (props) => {
   const addName = (event) => {
     event.preventDefault()
 
-    if (props.persons.find(person => person.name === props.newName)) {
-      alert(`${newName} is already added to phonebook`)
-      return
-    }
-
     const nameObject = {
       name: props.newName,
       number: props.newNumber,
       //id: String(props.persons.length + 1),
     }
 
-    personsService
-      .create(nameObject)
-      .then(returnedPerson => props.setPersons(props.persons.concat(returnedPerson)))
+    let personToUpdate = null
+  
+    if (props.persons.find(person => {
+      if (person.name === props.newName) {
+        personToUpdate = person
+        return true
+      } else {
+        return false
+      }})) {
+    
+      if (window.confirm(`${personToUpdate.name} is already added to phonebook, replace the old number with a new one?`)) {
+        personsService
+          .update(personToUpdate.id, nameObject)
+          .then(returnedUpdated => {
+            //console.log("Updated ID", returnedUpdated)
+            props.setPersons(props.persons.map(person => (person.id != returnedUpdated.id) ? person : returnedUpdated))
+            props.setNewName('')
+            props.setNewNumber('')
+          })
+      } else {
+        props.setNewName('')
+        props.setNewNumber('')
+      }
+    } else {
 
-    props.setNewName('')
-    props.setNewNumber('')
+      personsService
+        .create(nameObject)
+        .then(returnedPerson => props.setPersons(props.persons.concat(returnedPerson)))
+
+      props.setNewName('')
+      props.setNewNumber('')
+    }
+
+    
   }
 
   const handleNameChange = (event) => {
@@ -78,7 +101,7 @@ const Persons = (props) => {
       personsService
         .deleteID(id)
         .then(returnedDeleted => {
-          console.log("Deleted ID", returnedDeleted)
+          //console.log("Deleted ID", returnedDeleted)
           props.setPersons(props.persons.filter(person => (person.id != returnedDeleted.id)))
         })
     }
