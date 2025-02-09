@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import personsService from './services/persons'
+import './index.css'
 
 const Filter = (props) => {
 
@@ -45,6 +46,14 @@ const PersonForm = (props) => {
           .then(returnedUpdated => {
             //console.log("Updated ID", returnedUpdated)
             props.setPersons(props.persons.map(person => (person.id != returnedUpdated.id) ? person : returnedUpdated))
+            
+            props.setNotification(
+              {isSuccess: true, message: `Changed ${props.newName} numnber to ${props.newNumber}`}
+            )
+            setTimeout(() => {
+              props.setNotification({isSuccess: null, message: null})
+            }, 5000)
+            
             props.setNewName('')
             props.setNewNumber('')
           })
@@ -57,7 +66,14 @@ const PersonForm = (props) => {
       personsService
         .create(nameObject)
         .then(returnedPerson => props.setPersons(props.persons.concat(returnedPerson)))
-
+      
+        props.setNotification(
+          {isSuccess: true, message: `Added ${props.newName}`}
+        )
+        setTimeout(() => {
+          props.setNotification({isSuccess: null, message: null})
+        }, 5000)
+      
       props.setNewName('')
       props.setNewNumber('')
     }
@@ -118,12 +134,26 @@ const Persons = (props) => {
   } 
 }
 
+const Notification = ({notification: {isSuccess, message}}) => {
+  if (!message) {
+    return null
+  }
+  console.log({isSuccess})
+  console.log({message})
+  return ( // Cleaner way to return conditionally
+    <div className={isSuccess ? 'success' : 'error'}>
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
 
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [search, setSearch] = useState('')
+  const [notification, setNotification] = useState({isSuccess: null, message: null})
 
   useEffect(() => {
     personsService
@@ -135,7 +165,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      
+      <Notification notification={notification}/>
       <Filter search={search} setSearch={setSearch}/>
       
       <h2>Add a new</h2>
@@ -143,6 +173,7 @@ const App = () => {
       <PersonForm persons={persons} setPersons={setPersons} 
                   newName={newName} setNewName={setNewName} 
                   newNumber={newNumber} setNewNumber={setNewNumber}
+                  notification={notification} setNotification={setNotification}
       />
      
       <h2>Numbers</h2>
