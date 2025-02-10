@@ -69,7 +69,7 @@ const App = () => {
         setMessage('Too many matches, specify another filter')
       )
     } else if (countriesMatched.length > 1) {
-      const countriesMessage = countriesMatched.map(c => (<div key={c}>{c}<br /></div>))
+      const countriesMessage = countriesMatched.map(c => (<div key={c}>{c}<button onClick={(() => setSearch(c))}>show</button><br /></div>))
       setMessage(countriesMessage)
     } else if (countriesMatched.length === 1) {
       setMessage(null)
